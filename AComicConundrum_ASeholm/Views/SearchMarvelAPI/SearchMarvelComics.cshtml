@@ -1,0 +1,25 @@
+﻿@model IEnumerable<AComicConundrum_ASeholm.Models.Comic>
+
+@{
+    ViewBag.Title = "SearchMarvelComics";
+}
+
+<h2>SearchMarvelComics</h2>
+
+<table id="grid-selection" class="table table-condensed table-hover table-striped">
+    <thead>
+        <tr>
+            <th data-column-id="id" data-type="numeric" data-identifier="true">ID</th>
+            <th data-column-id="issueNumber">Issue Number</th>
+            <th data-column-id="series">Series</th>
+            <th data-column-id="author">Author</th>
+            <th data-column-id="artist">Artist</th>
+            <th data-column-id="yearPublished">Year Published</th>
+            <th data-column-id="issueNumber">Issue Number</th>
+            <th data-column-id="issueNumber">Issue Number</th>
+            <th data-column-id="issueNumber">Issue Number</th>
+            <th data-column-id="received" data-order="desc">Received</th>
+            <th data-column-id="link" data-formatter="link" data-sortable="false">Link</th>
+        </tr>
+    </thead>
+</table>

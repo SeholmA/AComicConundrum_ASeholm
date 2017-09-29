@@ -1,0 +1,134 @@
+﻿@using System.Web.Mvc.Html
+@model IEnumerable<AComicConundrum_ASeholm.Models.Comic>
+
+@{
+    ViewBag.Title = "Index";
+}
+@Scripts.Render("~/bundles/jquery")
+
+<style>
+    #comicContainer #comics table thead tr {
+    background-color: #999;
+}
+
+    #comicContainer #comics table thead tr th {
+        padding: 10px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    #comicContainer #comics table tbody tr td {
+        text-align: center;
+        padding: 5px;
+        border-bottom: 1px solid #999;
+    }
+
+    #comicContainer #comics table {
+        border: 1px solid #999;
+    }
+
+    #comicContainer #comics table tbody tr:nth-of-type(even) {
+        background-color: #f3f3f3;
+    }
+</style>
+
+
+<h2>Comic Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table" id="tblMyComics">
+    <tr>
+        <th> @Html.DisplayNameFor(model => model.strTitle) </th>
+        <th> @Html.DisplayNameFor(model => model.iIssueNumber) </th>
+        <th> @Html.DisplayNameFor(model => model.strSeries) </th>
+        <th> @Html.DisplayNameFor(model => model.strPublisher) </th>
+        <th> @Html.DisplayNameFor(model => model.strAuthor) </th>
+        <th> @Html.DisplayNameFor(model => model.strArtist) </th>
+        <th> @Html.DisplayNameFor(model => model.iYearPublished) </th>
+        <th> @Html.DisplayNameFor(model => model.bRead) </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td> @Html.DisplayFor(modelItem => item.strTitle) </td>
+            <td> @Html.DisplayFor(modelItem => item.iIssueNumber) </td>
+            <td> @Html.DisplayFor(modelItem => item.strSeries) </td>
+            <td> @Html.DisplayFor(modelItem => item.strPublisher) </td>
+            <td> @Html.DisplayFor(modelItem => item.strAuthor) </td>
+            <td> @Html.DisplayFor(modelItem => item.strArtist) </td>
+            <td> @Html.DisplayFor(modelItem => item.iYearPublished) </td>
+            <td> @Html.EditorFor(modelItem => item.bRead) </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.ID }) |
+                @Html.ActionLink("Details", "Details", new { id = item.ID }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.ID })
+            </td>
+        </tr>
+    }
+</table>
+
+@*@Html.Partial("_SearchMarvel", @Model)*@
+<header><h2>Search Marvel<span style="float:right" id="step3-collapse" class="collapse">Collapse Section</span><span style="float:right; display:none;" id="step3-expand" class="expand">Expand Section</span></h2></header>
+<input type="text" class="form-control" name="txtmarvelsearch" id="txtMarvelSearch" placeholder="Search Title...">
+<div class="editor-field"><input type="button" value="Submit" id="btnMarvelSearch" class="bluebtn" /></div>
+@*<button type="button" id="btnMarvelSearch"><span class="glyphicon glyphicon-search"></span></button>*@
+
+<div id="searchMsg"></div>
+
+<table id="comicTable" class="table">
+    <thead>
+        <tr>
+            <th> Title of Comic </th>
+            <th> Issue# </th>
+            <th> Series </th>
+            <th> Page Count</th>
+            <th> Creator/Contributor </th>
+        </tr>
+    </thead>
+
+    <tbody></tbody>
+
+</table>
+
+<script type="text/javascript" >
+
+    var marvelSearch = $("#txtMarvelSearch").val();
+
+    $("#btnMarvelSearch").click( function () {
+        //clear msg, hide table, show loading
+        //$("#comicContainer #msg, #comics table tbody").html("");
+        //$("#comics table").hide();
+        $.get("@Url.Action("GetComics", "Comic")", { _strSearch: marvelSearch }, function (dt) {
+            //alert("Inside URL Action");
+            if (dt.data.results.length > 0) {
+            $.each(dt.data.results, function (i, comic) {
+                    var html = "";
+                    //alert(comic.title);
+                    html += "<tr id=" + comic.id + ">";
+                    html += "<td>" + comic.title + "</td>";
+                    html += "<td>" + comic.issueNumber + "</td>";
+                    html += "<td>" + comic.series.name + "</td>";
+                    //$.each(comic.creators.items, function (x, creator) {
+                    //    html += "<tr>" + creator.name + " - " + creator.role + "</tr>"
+                //});
+                    if (comic.creators.items.length > 0)
+                        html += "<td>" + comic.creators.items[0].name + " - " + comic.creators.items[0].role + "</td>";
+                    else
+                        html += "<td></td>";
+                    html += "<td>" + comic.pageCount + "</td>";
+                    
+                    $("#comicTable").find("tbody").append(html);
+                    $("#comicTable").show();
+                });
+            }
+            else {
+                $("#searchMsg").html("There were no results for: " + marvelSearch);
+            }
+        });//end of '$.get(...)'
+
+    });
+</script>

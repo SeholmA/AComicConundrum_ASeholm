@@ -1,0 +1,74 @@
+﻿@model AComicConundrum_ASeholm.Models.Comic
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Comic Details</h2>
+
+<div>
+    <h4>Comic</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.strTitle)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.strTitle)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.iIssueNumber)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.iIssueNumber)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.strSeries)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.strSeries)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.strPublisher)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.strPublisher)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.strAuthor)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.strAuthor)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.strArtist)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.strArtist)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.iYearPublished)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.iYearPublished)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

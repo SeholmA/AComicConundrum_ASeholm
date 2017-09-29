@@ -1,0 +1,76 @@
+﻿@model IEnumerable<AComicConundrum_ASeholm.Models.Comic>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.strTitle)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.iIssueNumber)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.strSeries)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.strPublisher)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.strAuthor)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.strArtist)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.iYearPublished)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.bRead)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.strTitle)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.iIssueNumber)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.strSeries)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.strPublisher)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.strAuthor)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.strArtist)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.iYearPublished)
+        </td>
+        <td>
+             @Html.EditorFor(modelItem => item.bRead)
+             @*@Html.ValidationMessageFor(modelItem => modelItem.b, "", new { @class = "text-danger" })*@
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.ID }) |
+            @Html.ActionLink("Details", "Details", new { id=item.ID }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.ID })
+        </td>
+    </tr>
+}
+
+</table>

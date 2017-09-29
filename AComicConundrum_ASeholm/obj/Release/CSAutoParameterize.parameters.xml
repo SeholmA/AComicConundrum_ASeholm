@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <parameter name="ComicContext-Web.config Connection String" description="ComicContext Connection String used in web.config by the application to access the database." defaultValue="Data Source=(LocalDb)\MSSQLLocalDB;Initial Catalog=AComicConundrum_ASeholm1;Integrated Security=SSPI;" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="C:\\Users\\aseholm\\Documents\\Visual\ Studio\ 2015\\Projects\\AComicConundrum_ASeholm\\AComicConundrum_ASeholm\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='ComicContext']/@connectionString" />
+  </parameter>
+  <parameter name="ComicContext_DatabasePublish-Web.config Connection String" description="ComicContext_DatabasePublish Connection String used in web.config by the application to access the database." defaultValue="ComicContext_DatabasePublish.ConnetionString" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="C:\\Users\\aseholm\\Documents\\Visual\ Studio\ 2015\\Projects\\AComicConundrum_ASeholm\\AComicConundrum_ASeholm\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='ComicContext_DatabasePublish']/@connectionString" />
+  </parameter>
+</parameters>

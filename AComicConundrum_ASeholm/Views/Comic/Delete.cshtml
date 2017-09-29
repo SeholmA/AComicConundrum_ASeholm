@@ -1,0 +1,80 @@
+﻿@model AComicConundrum_ASeholm.Models.Comic
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Delete Comic Entry</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Comic</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.strTitle)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.strTitle)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.iIssueNumber)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.iIssueNumber)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.strSeries)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.strSeries)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.strPublisher)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.strPublisher)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.strAuthor)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.strAuthor)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.strArtist)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.strArtist)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.iYearPublished)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.iYearPublished)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+</div>
