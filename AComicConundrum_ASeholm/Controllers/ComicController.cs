@@ -157,38 +157,62 @@ namespace AComicConundrum_ASeholm.Controllers
         /// <param name="_strType"></param>
         /// <param name="_strSearch"></param>
         /// <returns></returns>
-        public JsonResult GetComics(/*string _strType,*/ string _strSearch)
+        public JsonResult GetComics(string _filter, string _order, string _limit, string _text)
         {
-            /*
-            IEnumerable<Comic> comics = Enumerable.Empty<Comic>();
+            //Text
+            string text = "";
+            if (_text != "" && _text != null)
+                text = _text.Replace(",", "%2C").Replace(" ", "%20");
+            else
+                text = "Spider-Man";
 
-            switch (_strType)
+            //Limit
+            string limit = "";
+            if (_limit != "" && _limit != null && _limit != "Limit" && _limit != " Limit ")
+                limit = _limit.Replace("S", String.Empty).Replace("h", String.Empty).Replace("o", String.Empty).Replace("w", String.Empty).Replace(" ", String.Empty);
+            else
+                limit = "25";
+
+            //Order
+            string order = "";
+            switch (_order)
             {
-                case "Artist":
+                case " Title (asc)":
+                    order = "title";
                     break;
-                case "Character":
+                case " Title (desc)":
+                    order = "-title";
                     break;
-                case "Creator":
+                case " Issue# (acs)":
+                    order = "issueNumber";
                     break;
-                case "Title":
-                    comics = m_service.GetComicsByTitle(_strSearch).Result;
-                    break;
-                case "Writer":
+                case " Issue# (desc)":
+                    order = "-issueNumber";
                     break;
                 default:
-                    comics = m_service.GetComicsByTitle(_strSearch).Result;
+                    order = "title";
                     break;
-            }*/
-            //timestamp+public+private
-            //TODO: Fix return
-            try
-            {
-                m_vm.marvelRootObj = m_marvelservice.GetComicsByTitle(_strSearch).Result;
             }
-            catch(Exception ex) { }
 
-            //Rootobject ro = new Rootobject();
-            //ro.data.results[0].creators.items[0].name
+            //Filter
+            if (_filter != null)
+                _filter.Replace(" ", String.Empty);
+            switch (_filter)
+            {
+                case " By Title":
+                    m_vm.marvelRootObj = m_marvelservice.GetComicsByTitle(text, order, limit).Result;
+                    break;
+                case " By Character":
+                    m_vm.marvelRootObj = m_marvelservice.GetComicsByCharacter(text, order, limit).Result;
+                    break;
+                case " By Contributor":
+                    m_vm.marvelRootObj = m_marvelservice.GetComicsByContributor(text, order, limit).Result;
+                    break;
+                default:
+                    m_vm.marvelRootObj = m_marvelservice.GetComicsByTitle(text, order, limit).Result;
+                    break;
+            }
+           
             return Json(m_vm.marvelRootObj, JsonRequestBehavior.AllowGet);
         }
     }

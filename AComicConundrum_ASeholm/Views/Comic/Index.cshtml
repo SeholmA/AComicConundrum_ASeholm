@@ -9,31 +9,27 @@
 <style>
     #comicContainer #comics table thead tr {
     background-color: #999;
-}
-
+    }
     #comicContainer #comics table thead tr th {
         padding: 10px;
         font-weight: bold;
         text-align: center;
     }
-
     #comicContainer #comics table tbody tr td {
         text-align: center;
         padding: 5px;
         border-bottom: 1px solid #999;
     }
-
     #comicContainer #comics table {
         border: 1px solid #999;
     }
-
     #comicContainer #comics table tbody tr:nth-of-type(even) {
         background-color: #f3f3f3;
     }
 </style>
 
 
-<h2>Comic Index</h2>
+<h2>Your Saved Comic Library</h2>
 
 <p>
     @Html.ActionLink("Create New", "Create")
@@ -72,10 +68,56 @@
 </table>
 
 @*@Html.Partial("_SearchMarvel", @Model)*@
-<header><h2>Search Marvel<span style="float:right" id="step3-collapse" class="collapse">Collapse Section</span><span style="float:right; display:none;" id="step3-expand" class="expand">Expand Section</span></h2></header>
-<input type="text" class="form-control" name="txtmarvelsearch" id="txtMarvelSearch" placeholder="Search Title...">
-<div class="editor-field"><input type="button" value="Submit" id="btnMarvelSearch" class="bluebtn" /></div>
-@*<button type="button" id="btnMarvelSearch"><span class="glyphicon glyphicon-search"></span></button>*@
+
+<div class="container">
+    <div class="row"></div>
+    <div class="row"><h2>Search Comics Using Marvel API</h2></div>
+    <div class="row">
+        <div class="col-xs-8 col-xs-offset-2">
+            <div class="input-group">
+                <div class="input-group-btn search-panel">
+                    <button type="button" id="ddlbtnFilter" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                        <span class="glyphicon glyphicon-filter"></span><span id="search_concept"> Filter by</span> <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="#filterby_title"> By Title</a></li>
+                    </ul>
+                </div>
+                <div class="input-group-btn order-by">
+                    <button type="button" id="ddlbtnOrder" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                        <span class="glyphicon glyphicon-list"></span><span id="order_concept"> OrderBy </span> <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="#orderby_title_ascending"> Title (asc)</a></li>
+                        <li><a href="#orderby_title_descending"> Title (desc)</a></li>
+                        <li><a href="#orderby_issuenumber_ascending"> Issue# (acs)</a></li>
+                        <li><a href="#orderby_issuenumber_descending"> Issue# (desc)</a></li>
+                    </ul>
+                </div>
+                <div class="input-group-btn limit-by">
+                    <button type="button" id="ddlbtnLimit" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                        <span class="glyphicon glyphicon-stats"></span><span id="limit_concept"> Limit </span> <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="#limitby_10"> Show 10</a></li>
+                        <li><a href="#limitby_25"> Show 25</a></li>
+                        <li><a href="#limitby_50"> Show 50</a></li>
+                        <li><a href="#limitby_100"> Show 100</a></li>
+                    </ul>
+                </div>
+                <input type="hidden" name="search_param" value="all" id="search_param">
+                <input type="hidden" name="search_param" value="all" id="search_param">
+                <input type="hidden" name="search_param" value="all" id="search_param">
+                <input type="hidden" name="search_param" value="all" id="search_param">
+                <input type="text"  id="txtMarvelSearch" class="form-control" name="x" placeholder="Search term...">
+                <div class="input-group-btn execute-search">
+                    <button id="btnMarvelSearch" class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"></span> Search Marvel API </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <div id="searchMsg"></div>
 
@@ -94,40 +136,63 @@
 
 </table>
 
-<script type="text/javascript" >
+<script type="text/javascript">
 
-    var marvelSearch = $("#txtMarvelSearch").val();
+    //filter-by dropdown
+    $('.search-panel .dropdown-menu').find('a').click(function (e) {
+        e.preventDefault();
+        var param = $(this).attr("href").replace("#", "");
+        var concept = $(this).text();
+        $('.search-panel span#search_concept').text(concept);
+        //$('.input-group #search_param').val(param);
+    });
 
-    $("#btnMarvelSearch").click( function () {
-        //clear msg, hide table, show loading
-        //$("#comicContainer #msg, #comics table tbody").html("");
-        //$("#comics table").hide();
-        $.get("@Url.Action("GetComics", "Comic")", { _strSearch: marvelSearch }, function (dt) {
-            //alert("Inside URL Action");
+    //order-by dropdown
+    $('.order-by .dropdown-menu').find('a').click(function (e) {
+        e.preventDefault();
+        var param = $(this).attr("href").replace("#", "");
+        var concept = $(this).text();
+        $('.order-by span#order_concept').text(concept);
+        //$('.input-group #search_param').val(param);
+    });
+
+    //Limit dropdown
+    $('.limit-by .dropdown-menu').find('a').click(function (e) {
+        e.preventDefault();
+        var param = $(this).attr("href").replace("#", "");
+        var concept = $(this).text();
+        $('.limit-by span#limit_concept').text(concept);
+        //$('.input-group #search_param').val(param);
+    });
+
+    //Execute Search Function
+    $("#btnMarvelSearch").click(function () {
+        var filter = document.getElementById('search_concept').innerHTML;//$("ddlbtnFilter").val();
+        var order = document.getElementById('order_concept').innerHTML;//$("ddlbtnOrder").val();
+        var limit = document.getElementById('limit_concept').innerHTML;//$("ddlbtnLimit").val();
+        var text = $("#txtMarvelSearch").val();
+        $("#comicTable tbody").html("");
+        $("#searchMsg").html("");
+        $.get("@Url.Action("GetComics", "Comic")", { _filter:filter, _order:order, _limit:limit, _text:text }, function (dt) {
             if (dt.data.results.length > 0) {
-            $.each(dt.data.results, function (i, comic) {
-                    var html = "";
-                    //alert(comic.title);
+                $.each(dt.data.results, function (i, comic) {
+                    var html = ""; //alert(comic.title);
                     html += "<tr id=" + comic.id + ">";
                     html += "<td>" + comic.title + "</td>";
                     html += "<td>" + comic.issueNumber + "</td>";
                     html += "<td>" + comic.series.name + "</td>";
-                    //$.each(comic.creators.items, function (x, creator) {
-                    //    html += "<tr>" + creator.name + " - " + creator.role + "</tr>"
-                //});
+
                     if (comic.creators.items.length > 0)
                         html += "<td>" + comic.creators.items[0].name + " - " + comic.creators.items[0].role + "</td>";
                     else
                         html += "<td></td>";
+
                     html += "<td>" + comic.pageCount + "</td>";
-                    
                     $("#comicTable").find("tbody").append(html);
                     $("#comicTable").show();
                 });
             }
-            else {
-                $("#searchMsg").html("There were no results for: " + marvelSearch);
-            }
+            else { $("#searchMsg").html("There were no results for: " + text); }
         });//end of '$.get(...)'
 
     });
