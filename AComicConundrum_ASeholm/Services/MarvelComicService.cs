@@ -20,38 +20,19 @@ namespace AComicConundrum_ASeholm.Services
 {
     public class MarvelComicService
     {
-        //private string m_strApiURL = ConfigurationManager.AppSettings["9a034a32a5eee9afa2d144456108a541"]; //??? private string _key = ConfigurationManager.AppSettings["APIAppKey"];
-                                                                                                           //var url = "http://gateway.marvel.com/v1/public/comics?limit=100&format=comic&formatType=comic&dateRange="+year+"-01-01%2C"+year+"-12-31&apikey="+KEY;
-        private string m_strBaseURL = "https://gateway.marvel.com:443/v1/public/comics?ts=";
+        private string m_strBaseURL = "https://gateway.marvel.com:443/v1/public/";
         private string m_strPrivateAPI = "55c4c5c93bf33b3ac73c8e7bc51f7be5e4c6871c";
         private string m_strPublicAPI = "9a034a32a5eee9afa2d144456108a541";
-        private MD5 hashMD5;
 
         static HttpClient client = new HttpClient();
 
 
         /// <summary>
-        /// Creates Hash and convers to hex
+        /// Creates the (MD5)Hash value that needs to be added to the
+        /// end of the API call and then converts it to a HexValue - private MD5 hashMD5;
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="stream"></param>
-        /// <returns></returns>
-        public static String GetHash<T>(Stream stream) where T : HashAlgorithm
-        {
-            StringBuilder sb = new StringBuilder();
-
-            MethodInfo create = typeof(T).GetMethod("Create", new Type[] { });
-            using (T crypt = (T)create.Invoke(null, null))
-            {
-                byte[] hashBytes = crypt.ComputeHash(stream);
-                foreach (byte bt in hashBytes)
-                {
-                    sb.Append(bt.ToString("x2"));
-                }
-            }
-            return sb.ToString();
-        }
-
+        /// <param name="data">(timestamp+privateKey+publicKey)</param>
+        /// <returns>Hex has value of (timestamp+privateKey+publicKey)</returns>
         public string Hash(string data)
         {
             MD5 md5 = MD5.Create();
@@ -66,148 +47,108 @@ namespace AComicConundrum_ASeholm.Services
 
             return sb.ToString();
         }
-
-        public async Task<IEnumerable<Comic>> GetComics(int _iNoVariants = -1, string _strDateDescriptor = "", string _strTitle = "", int _iIssueNumber = -1,
-                                                        string _strCreators = "", string _strOrderBy = "", int _iLimit = 1, int _iOffset = -1)
-        {
-            string URL = m_strBaseURL;
-
-            //NoVariants
-            if (_iNoVariants == 0)
-                URL += "noVariants=false";
-            else if (_iNoVariants == 1)
-                URL += "noVariants=true";
-
-            //Date Descriptor
-            if (_strDateDescriptor != "")
-                URL += "&dateDescriptor="+_strDateDescriptor;
-
-            //Title
-            if (_strTitle != "")
-            {
-                //TODO: Add title parse logic
-                URL += "&title=";
-            }
-
-            //Issue Number
-            if (_iIssueNumber != -1)
-                URL += "&issueNumber="+_iIssueNumber;
-
-            //Creators
-            if(_strCreators != "")
-            {
-                //TODO: Add list parse logic
-                URL += "&creators=";
-            }
-
-            //Characters
-
-            //OrderBy
-            if (_strOrderBy != "")
-                URL += "&orderBy="+_strOrderBy;
-
-            //Limit
-            if (_iLimit > 100)
-                URL += "&limit=100";
-            else if(_iLimit < 1)
-                URL += "&limit=1";
-            else
-                URL += "&limit=" + _iLimit;
-
-            //Offset
-            if (_iOffset > 0)
-                URL += "&offset="+_iOffset;
-
-            //TODO - ADD API KEY
-
-
-            //Perform calls to get the comics
-            String json = String.Empty;
-            Uri getComics = new Uri(URL);
-
-            using (HttpClient client = new HttpClient())
-                json = await client.GetStringAsync(getComics).ConfigureAwait(false); //???
-
-            IEnumerable<Comic> comics = JsonConvert.DeserializeObject<IEnumerable<Comic>>(json);
-            return comics;
-        }
-
+        
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="_strTitle"></param>
+        /// <param name="_title"></param>
+        /// <param name="_order"></param>
+        /// <param name="_limit"></param>
         /// <returns></returns>
-        public async Task<Rootobject> GetComicsByTitle(string _strTitle)
+        public async Task<Rootobject> GetComicsByTitle(string _title, string _order, string _limit)
         {
             //long unixTimestamp = new DateTimeOffset(DateTime.Now)();
             string _time = "1506630992";//DateTime.Now.ToString();
             string _param = _time + m_strPrivateAPI + m_strPublicAPI;
             string _hash = Hash(_param);
 
-            string URL = m_strBaseURL;
+            if(_title == "" || _title == null)
+                _title = "Batman";
+
+            string URL = m_strBaseURL + "comics?ts=";
             URL += _time;
             URL += "&noVariants=true";
-            URL += "&title=Spider-man";
-            URL += "&orderBy=-title";
-            URL += "&limit=22";
+            URL += "&titleStartsWith=" + _title;
+            URL += "&orderBy=" + _order;
+            URL += "&limit=" + _limit;
             URL += "&apikey=" + m_strPublicAPI + "&hash=" + _hash;
-            //TODO: Add title parse logic
-            /*if (_strTitle != "")
-            {
-                URL += "&title=";
-            }*/
+
             String json = String.Empty;
             Uri getComics = new Uri(URL);
-
-            /*using (HttpClient client = new HttpClient())
-                json = await client.GetStringAsync(getComics).ConfigureAwait(false); //???*/
-
-            //IEnumerable<Comic> comics = JsonConvert.DeserializeObject<IEnumerable<Comic>>(json);
+            
             using(HttpClient hc = new HttpClient())
-                json = await client.GetStringAsync(getComics).ConfigureAwait(false);
+                json = await hc.GetStringAsync(getComics).ConfigureAwait(false);
             
             return JsonConvert.DeserializeObject<Rootobject>(json);
-            /*JArray comicParse = JArray.Parse(json);
-            IEnumerable<Comic> comics = comicParse.Select(x => new Models.Comic
-            {
-
-            });*/
-
-
-            //return data;
         }
 
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="_character"></param>
+        /// <param name="_order"></param>
+        /// <param name="_limit"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<Comic>> GetComicsByIssue(int _iIssue)
+        public async Task<Rootobject> GetComicsByCharacter(string _character, string _order, string _limit)
         {
-            Uri getComics = new Uri(m_strBaseURL + @"" + _iIssue);
+            //long unixTimestamp = new DateTimeOffset(DateTime.Now)();
+            string _time = "1506630992";//DateTime.Now.ToString();
+            string _param = _time + m_strPrivateAPI + m_strPublicAPI;
+            string _hash = Hash(_param);
+
+            if (_character == "" || _character == null)
+                _character = "Batman";
+
+            string URL = m_strBaseURL;
+            URL += _time;
+            URL += "&noVariants=true";
+            URL += "&characters=" + _character;
+            URL += "&orderBy=" + _order;
+            URL += "&limit=" + _limit;
+            URL += "&apikey=" + m_strPublicAPI + "&hash=" + _hash;
+
             String json = String.Empty;
+            Uri getComics = new Uri(URL);
 
-            using (HttpClient client = new HttpClient())
-                json = await client.GetStringAsync(getComics).ConfigureAwait(false); //???
+            using (HttpClient hc = new HttpClient())
+                json = await hc.GetStringAsync(getComics).ConfigureAwait(false);
 
-            IEnumerable<Comic> comics = JsonConvert.DeserializeObject<IEnumerable<Comic>>(json);
-            return comics;
+            return JsonConvert.DeserializeObject<Rootobject>(json);
         }
 
         
         /// <summary>
         /// 
         /// </summary>
-        public async Task<IEnumerable<Comic>> GetComicsByPublisher(string _strPublisher)
+        /// <param name="_creator"></param>
+        /// <param name="_order"></param>
+        /// <param name="_limit"></param>
+        /// <returns></returns>
+        public async Task<Rootobject> GetComicsByContributor(string _creator, string _order, string _limit)
         {
-            Uri getComics = new Uri(m_strBaseURL + @"" + _strPublisher);
+            string _time = "1506630992";//DateTime.Now.ToString();
+            string _param = _time + m_strPrivateAPI + m_strPublicAPI;
+            string _hash = Hash(_param);
+
+            if (_creator == "" || _creator == null)
+                _creator = "Batman";
+
+            string URL = m_strBaseURL;
+            URL += _time;
+            URL += "&noVariants=true";
+            URL += "&creators=" + _creator;
+            URL += "&orderBy=" + _order;
+            URL += "&limit=" + _limit;
+            URL += "&apikey=" + m_strPublicAPI + "&hash=" + _hash;
+
             String json = String.Empty;
+            Uri getComics = new Uri(URL);
 
-            using (HttpClient client = new HttpClient())
-                json = await client.GetStringAsync(getComics).ConfigureAwait(false); //???
+            using (HttpClient hc = new HttpClient())
+                json = await hc.GetStringAsync(getComics).ConfigureAwait(false);
 
-            IEnumerable<Comic> comics = JsonConvert.DeserializeObject<IEnumerable<Comic>>(json);
-            return comics;
+            return JsonConvert.DeserializeObject<Rootobject>(json);
         }
     }
 }

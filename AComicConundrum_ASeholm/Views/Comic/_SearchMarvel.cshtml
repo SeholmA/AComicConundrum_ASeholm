@@ -1,46 +1,68 @@
 ﻿<header><h2>Search Marvel<span style="float:right" id="step3-collapse" class="collapse">Collapse Section</span><span style="float:right; display:none;" id="step3-expand" class="expand">Expand Section</span></h2></header>
 
-<style>
-    /*Search - version 2*/
-    .navbar .navbar-search .dropdown-menu {
-        min-width: 25px;
-    }
-    .dropdown-menu .label-icon {
-        margin-left: 5px;
-    }
-    .btn-outline {
-        background-color: transparent;
-        color: inherit;
-        transition: all .5s;
-    }
-</style>
-<input type="text" class="form-control" name="txtmarvelsearch" id="txtMarvelSearch" placeholder="Search Title...">
-<button type="button" class="btn btn-search btn-default" id="btnMarvelSearch"><span class="glyphicon glyphicon-search"></span></button>
+<div class="" id="grpSearch">
+    <input type="text" class="form-control" name="txtmarvelsearch" id="txtMarvelSearch" placeholder="Search Title...">
+    <div class="editor-field"><input type="button" value="Submit" id="btnMarvelSearch" class="bluebtn" /></div>
+    @*<button type="button" id="btnMarvelSearch"><span class="glyphicon glyphicon-search"></span></button>*@
+</div>
+
+<div id="searchMsg"></div>
+
+<table id="comicTable" class="table">
+    <thead>
+        <tr>
+            <th> Title of Comic </th>
+            <th> Issue# </th>
+            <th> Series </th>
+            <th> Page Count</th>
+            <th> Creator/Contributor </th>
+        </tr>
+    </thead>
+
+    <tbody></tbody>
+
+</table>
 
 <script type="text/javascript">
 
     var marvelSearch = $("#txtMarvelSearch").val();
-    $("#btnMarvelSearch").on("click", function () {
-        //clear the messages
-        //$("#msg-addComic").html("");
 
-        $.get("@Url.Action("GetComics", "Comic")", { _strSearch: marvelSearch }, function (data) {
-            //data.
+    $("#btnMarvelSearch").click( function () {
+        //clear msg, hide table, show loading
+        $("#comicTable").html("");
+        $("#searchMsg").html("");
+        //$("#comics table").hide();
+        $.get("@Url.Action("GetComics", "Comic")", { _strSearch: marvelSearch }, function (dt) {
+            //alert("Inside URL Action");
+            if (dt.data.results.length > 0) {
+            $.each(dt.data.results, function (i, comic) {
+                    var html = "";
+                    //alert(comic.title);
+                    html += "<tr id=" + comic.id + ">";
+                    html += "<td>" + comic.title + "</td>";
+                    html += "<td>" + comic.issueNumber + "</td>";
+                    html += "<td>" + comic.series.name + "</td>";
+                    //$.each(comic.creators.items, function (x, creator) {
+                    //    html += "<tr>" + creator.name + " - " + creator.role + "</tr>"
+                //});
+                    if (comic.creators.items.length > 0)
+                        html += "<td>" + comic.creators.items[0].name + " - " + comic.creators.items[0].role + "</td>";
+                    else
+                        html += "<td></td>";
+                    html += "<td>" + comic.pageCount + "</td>";
+
+                    $("#comicTable").find("tbody").append(html);
+                    $("#comicTable").show();
+                });
+            }
+            else {
+                $("#searchMsg").html("There were no results for: " + marvelSearch);
+            }
         });//end of '$.get(...)'
-
-            @*$.ajax({
-            type: "get",
-            dataType: "json",
-            cache: false,
-            url: '@Url.Action("GetComics", "Comic")',
-            contentType: "application/json; charset=utf-8",
-            data: { a: "testing" },
-            success: function () { alert('Success'); },
-            error: errorFunc
-        });*@
 
     });
 </script>
+
 
 
 @*<h3> Search Marvel API v1</h3>
@@ -63,7 +85,7 @@
                     </div>
                     <input type="hidden" name="search_param" value="all" id="search_param">
                     <input type="text" class="form-control" name="x" placeholder="Search term...">
-                    <span class="input-group-btn">
+                    <span class="input-group-btn"> --
                         <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"></span></button>
                     </span>
                 </div>
